@@ -1,0 +1,14 @@
+a is equal to 3
+b equals 2
+a equals b
+a equals 2 - 3
+a equals 3 + b
+show a
+
+if a greater than 3 :
+    show "High"
+    if a is greater than 5 then
+        show "Very high"
+    endif
+endif
+

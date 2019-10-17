@@ -1,0 +1,20 @@
+Module: statements*=RootStatement;
+RootStatement: Statement;
+Statement: (IfStatement | PrintStatement | AssignmentStatement);
+PrintStatement: ('print' | 'display' | 'show') arg=expr;
+AssignmentStatement: target=Name ('=' | 'equals' | 'is equal to') value=expr;
+IfStatement: 'if' test=expr ('then:' | 'then :' | 'then' | ':') body*=Statement 'endif';
+
+expr: (BinOp | Compare | Value | Str);
+BinOp: left=Value op=Operator right=expr;
+Compare: left=Value op=CompOperator right=expr;
+Value: (Num | Name);
+Num: n=NUMBER;
+Name: id=ID;
+Str: s=STRING;
+
+Operator: (AddOperator | SubOperator);
+AddOperator: ('+' | 'plus');
+SubOperator: ('-' | 'minus');
+
+CompOperator: ('<' | '>' | '==' | '<=' | '>=' | 'greater than' | 'is greater than' | 'lower than' | 'is lower than' | 'equals' | 'is equal to' | 'is not equal to');
