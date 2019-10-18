@@ -1,14 +1,18 @@
-a is equal to 3
+a equals 3
 b equals 2
-a equals b
-a equals 2 - 3
-a equals 3 + b
+a equals b % 4 divided by (3 - 5) * 7
+a equals 2 + 3
+a equals 3 + (b + a) / 4
+c equals 3 * (b - a)
 show a
 
-if a greater than 3 :
+if a is different from 4:
     show "High"
-    if a is greater than 5 then
+    if a is greater than 5 or a is equal to 3 modulo 6 and 2 is greater or equal to (c minus (4 times 2)) then
         show "Very high"
+    endif
+    if a + 3 is greater than b:
+        show "nope"
     endif
 endif
 

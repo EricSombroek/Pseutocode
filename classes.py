@@ -3,21 +3,48 @@ class Num(object):
         self.parent = parent
         self.n = n
 
+class Expression(object):
+    def __init__(self, parent, logicalTerms, operators):
+        self.parent = parent
+        self.logicalTerms = logicalTerms
+        self.operators = operators
 
-class BinOp(object):
-    def __init__(self, parent, left, op, right):
+class LogicalTerm(object):
+    def __init__(self, parent, logicalFactors, operators):
+        self.parent = parent
+        self.logicalFactors = logicalFactors
+        self.operators = operators
+
+class LogicalFactor(object):
+    def __init__(self, parent, sign, operand):
+        self.parent = parent
+        self.sign = sign
+        self.operand = operand
+
+class BooleanEntity(object):
+    def __init__(self, parent, left, operator, right):
         self.parent = parent
         self.left = left
-        self.op = op
+        self.operator = operator
         self.right = right
 
-
-class Compare(object):
-    def __init__(self, parent, left, op, right):
+class ArithmeticExpression(object):
+    def __init__(self, parent, terms, operators):
         self.parent = parent
-        self.left = left
-        self.op = op
-        self.right = right
+        self.terms = terms
+        self.operators = operators        
+
+class Term(object):
+    def __init__(self, parent, factors, operators):
+        self.parent = parent
+        self.factors = factors
+        self.operators = operators
+
+class Factor(object):
+    def __init__(self, parent, sign, operand):
+        self.parent = parent
+        self.sign = sign
+        self.operand = operand
 
 
 class Statement(object):

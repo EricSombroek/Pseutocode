@@ -1,20 +1,40 @@
 Module: statements*=RootStatement;
 RootStatement: Statement;
 Statement: (IfStatement | PrintStatement | AssignmentStatement);
-PrintStatement: ('print' | 'display' | 'show') arg=expr;
-AssignmentStatement: target=Name ('=' | 'equals' | 'is equal to') value=expr;
-IfStatement: 'if' test=expr ('then:' | 'then :' | 'then' | ':') body*=Statement 'endif';
+PrintStatement: ('print' | 'display' | 'show') arg=Expression;
+AssignmentStatement: target=Name ('=' | 'equals') value=Expression;
+IfStatement: 'if' test=Expression ('then:' | 'then :' | 'then' | ':') body*=Statement 'endif';
 
-expr: (BinOp | Compare | Value | Str);
-BinOp: left=Value op=Operator right=expr;
-Compare: left=Value op=CompOperator right=expr;
-Value: (Num | Name);
+Expression: logicalTerms=LogicalTerm (operators=OrOperator logicalTerms=LogicalTerm)* ;
+OrOperator: '||' | 'or' ;
+
+LogicalTerm: logicalFactors=LogicalFactor (operators=AndOperator logicalFactors=LogicalFactor)* ;
+AndOperator: '&&' | 'and' ;
+
+LogicalFactor: (sign=BooleanUnaryOpeator)? (operand=BooleanEntity | '(' operand=Expression ')');
+BooleanUnaryOpeator: '!' | 'not' ;
+
+BooleanEntity: left=ArithmeticExpression (operator=ComparisonOperator (right=ArithmeticExpression | '(' right=Expression ')'))?;
+ComparisonOperator: EqualOperator | NotEqualOperator | GreaterOperator | GreaterOrEqualOperator | LowerOperator | LowerOrEqualOperator ;
+EqualOperator: '==' | 'is equal to' ;
+NotEqualOperator: '!=' | 'is not equal to' | 'is different from';
+GreaterOperator: '>' | 'is greater than' ;
+GreaterOrEqualOperator: '>=' | 'is greater or equal to';
+LowerOperator: '<' | 'is lower than' ;
+LowerOrEqualOperator: '<=' | 'is lower or equal to';
+
+ArithmeticExpression: terms=Term (operators=TermOperator terms=Term)*;
+TermOperator: '+' | '-' | 'plus' | 'minus';
+
+Term: factors=Factor (operators=FactorOperator factors=Factor)*;
+FactorOperator: '*' | 'times' | '/' | 'divided by' | '%' | 'modulo';
+
+Factor: (sign=UnaryOperator)?  (operand=Value | '(' operand=Expression ')');
+UnaryOperator:  '+' | 'plus' | '-' | 'minus';
+
+
+Value: (Num | Name | Str);
 Num: n=NUMBER;
 Name: id=ID;
 Str: s=STRING;
 
-Operator: (AddOperator | SubOperator);
-AddOperator: ('+' | 'plus');
-SubOperator: ('-' | 'minus');
-
-CompOperator: ('<' | '>' | '==' | '<=' | '>=' | 'greater than' | 'is greater than' | 'lower than' | 'is lower than' | 'equals' | 'is equal to' | 'is not equal to');

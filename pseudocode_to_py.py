@@ -10,7 +10,7 @@ class PseudoToPy:
         self.py_ast = ast.Module(body=[])
         self.variables = []
         self.pseudo_mm = metamodel_from_file('pseudocode.tx',
-                                             classes=[Num, BinOp, Compare, Statement, PrintStatement,
+                                             classes=[Num, Expression, LogicalTerm, LogicalFactor, BooleanEntity, ArithmeticExpression, Term, Factor, Statement, PrintStatement,
                                                       AssignmentStatement,
                                                       IfStatement])
         self.pseudo_mm.register_obj_processors({
@@ -35,6 +35,7 @@ class PseudoToPy:
             node = self.assignment_to_node(statement)
         elif type(statement) is IfStatement:
             node = self.if_to_node(statement)
+            
         else:
             raise
         return node
@@ -63,10 +64,22 @@ class PseudoToPy:
     def to_node(self, value):
         if isinstance(value, Num):
             node = ast.Num(n=value.n)
-        elif isinstance(value, BinOp):
-            node = self.create_binop_node(value)
-        elif isinstance(value, Compare):
-            node = self.create_compare_node(value)
+        
+        elif isinstance(value, Expression):
+            node = self.create_expression_node(value)
+        elif isinstance(value, LogicalTerm):
+            node = self.create_logical_term_node(value)
+        elif isinstance(value, LogicalFactor):
+            node = self.create_logical_factor_node(value)
+        elif isinstance(value, BooleanEntity):
+            node = self.create_boolean_entity_node(value)
+        elif isinstance(value, ArithmeticExpression):
+            node = self.create_arithmetic_expression_node(value)
+        elif isinstance(value, Term):
+            node = self.create_term_node(value)
+        elif isinstance(value, Factor):
+            node = self.create_factor_node(value)
+        
         elif isinstance(value, Statement):
             node = self.statement_to_node(value)
         elif hasattr(value, 'id'):
@@ -75,45 +88,86 @@ class PseudoToPy:
             node = ast.Str(s=value.s)
         return node
 
-    def create_binop_node(self, binop):
-        # Add | Sub | Mult | MatMult | Div | Mod | Pow | LShift
-        #                  | RShift | BitOr | BitXor | BitAnd | FloorDiv
-        def get_ast_op(x):
-            return {
-                '+': ast.Add(),
-                'plus': ast.Add(),
-                '-': ast.Sub(),
-                'minus': ast.Sub()
-            }.get(x)
+    def create_expression_node(self, expression):
+        if (len(expression.logicalTerms) == 1):
+            return self.to_node(expression.logicalTerms[0])
+        logicalTermsNodes = []
+        for t in expression.logicalTerms:
+            logicalTermsNodes.append(self.to_node(t))
+        return ast.BoolOp(ast.Or(), logicalTermsNodes)
 
-        left_node = self.to_node(binop.left)
-        right_node = self.to_node(binop.right)
-        op = get_ast_op(binop.op)
+    def create_logical_term_node(self, logicalTerm):
+        if (len(logicalTerm.logicalFactors) == 1):
+            return self.to_node(logicalTerm.logicalFactors[0])
+        logicalFactorsNodes = []
+        for f in logicalTerm.logicalFactors:
+            logicalFactorsNodes.append(self.to_node(f))
+        return ast.BoolOp(ast.And(), logicalFactorsNodes)
 
-        return ast.BinOp(left=left_node, op=op, right=right_node)
+    def create_logical_factor_node(self, logicalFactor):
+        if (logicalFactor.sign in ['!', 'not']):
+            return ast.UnaryOp(ast.Not(), self.to_node(logicalFactor.operand))
+        elif (logicalFactor.sign == None):
+            return self.to_node(logicalFactor.operand)
+        else:
+            raise
 
-    def create_compare_node(self, comp):
-        # Eq | NotEq | Lt | LtE | Gt | GtE | Is | IsNot | In | NotIn
-        def get_ast_op(x):
-            return {
-                '<': ast.Lt(),
-                'lower than': ast.Lt(),
-                'is lower than': ast.Lt(),
-                '<=': ast.LtE(),
-                '>': ast.Gt(),
-                'greater than': ast.Gt(),
-                'is greater than': ast.Gt(),
-                '>=': ast.GtE(),
-                '==': ast.Eq(),
-                'equals': ast.Eq(),
-                'is equal to': ast.Eq(),
-                'is not equal to': ast.NotEq(),
-            }.get(x)
+    def create_boolean_entity_node(self, booleanEntity):
+        pythonCmpOp = None;
+        leftNode = self.to_node(booleanEntity.left)
+        if (booleanEntity.operator == None):
+            return leftNode
+        elif (booleanEntity.operator in ['==', 'is equal to']):
+            pythonCmpOp = ast.Eq()
+        elif (booleanEntity.operator in ['!=', 'is not equal to', 'is different from']):
+            pythonCmpOp = ast.NotEq()
+        elif (booleanEntity.operator in ['>', 'is greater than']):
+            pythonCmpOp = ast.Gt();
+        elif (booleanEntity.operator in ['>=', 'is greater or equal to']):
+            pythonCmpOp = ast.GtE();
+        elif (booleanEntity.operator in ['<', 'is lower than']):
+            pythonCmpOp = ast.Lt();
+        elif (booleanEntity.operator in ['<=', 'is lower or equal to']):
+            pythonCmpOp = ast.LtE();
+        else:
+            raise
+        
+        rightNode = self.to_node(booleanEntity.right)
+        return ast.Compare(leftNode, (pythonCmpOp,), (rightNode,))
 
-        left_node = self.to_node(comp.left)
-        right_node = self.to_node(comp.right)
-        op = get_ast_op(comp.op)
-        return ast.Compare(left=left_node, ops=[op], comparators=[right_node])
+    def create_arithmetic_expression_node(self, arith_expr):
+        lastTermIndex = len(arith_expr.terms)
+        node = self.to_node(arith_expr.terms[0])
+        if lastTermIndex == 0:
+            return node
+        for i in range (1, lastTermIndex ):
+            if (arith_expr.operators[i-1] in ['+', 'plus']):
+                node = ast.BinOp(node, ast.Add(), self.to_node(arith_expr.terms[i]))
+            elif (arith_expr.operators[i-1] in ['-', 'minus']):
+                node = ast.BinOp(node, ast.Sub(), self.to_node(arith_expr.terms[i]))
+        return node
+    
+    def create_term_node(self, term):
+        lastFactorIndex = len(term.factors)
+        node = self.to_node(term.factors[0])
+        if lastFactorIndex == 0:
+            return node
+        for i in range (1, lastFactorIndex ):
+            if (term.operators[i-1] in ["*", "times"]):
+                node = ast.BinOp(node, ast.Mult(), self.to_node(term.factors[i]))
+            elif (term.operators[i-1] in ["/", "divided by"]):
+                node = ast.BinOp(node, ast.Div(), self.to_node(term.factors[i]))
+            elif (term.operators[i-1] in ["%", "modulo"]):
+                node = ast.BinOp(node, ast.Mod(), self.to_node(term.factors[i]))
+            else :
+                raise
+        return node
+
+    def create_factor_node(self, factor):
+        if (factor.sign in ['-', 'minus']):
+            return ast.UnaryOp(ast.USub(), self.to_node(factor.operand))
+        else:
+            return self.to_node(factor.operand)
 
 
 pseudo_to_py = PseudoToPy()
