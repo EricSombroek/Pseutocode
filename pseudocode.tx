@@ -29,9 +29,13 @@ TermOperator: '+' | '-' | 'plus' | 'minus';
 Term: factors=Factor (operators=FactorOperator factors=Factor)*;
 FactorOperator: '*' | 'times' | '/' | 'divided by' | '%' | 'modulo';
 
-Factor: (sign=UnaryOperator)?  (operand=Value | '(' operand=Expression ')');
-UnaryOperator:  '+' | 'plus' | '-' | 'minus';
+Factor: (sign=UnaryOperator)? base=ExponentiationBase (operators=ExponentOperator exponents=ExponentiationExponent)* ;
+ExponentOperator: '**' | 'power' | 'to the power of' ;
 
+ExponentiationBase: operand=Value | '(' operand=Expression ')' ;
+ExponentiationExponent: (sign=UnaryOperator)? (operand=Factor | '(' operand=Expression ')') ;
+
+UnaryOperator:  '+' | 'plus' | '-' | 'minus';
 
 Value: (Num | Name | Str);
 Num: n=NUMBER;

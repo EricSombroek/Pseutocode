@@ -41,6 +41,19 @@ class Term(object):
         self.operators = operators
 
 class Factor(object):
+    def __init__(self, parent, sign, base, operators, exponents):
+        self.parent = parent
+        self.sign = sign
+        self.base = base
+        self.operators = operators
+        self.exponents = exponents
+
+class ExponentiationBase(object):
+    def __init__(self, parent, operand):
+        self.parent = parent
+        self.operand = operand
+
+class ExponentiationExponent(object):
     def __init__(self, parent, sign, operand):
         self.parent = parent
         self.sign = sign

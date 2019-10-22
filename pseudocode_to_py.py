@@ -10,9 +10,21 @@ class PseudoToPy:
         self.py_ast = ast.Module(body=[])
         self.variables = []
         self.pseudo_mm = metamodel_from_file('pseudocode.tx',
-                                             classes=[Num, Expression, LogicalTerm, LogicalFactor, BooleanEntity, ArithmeticExpression, Term, Factor, Statement, PrintStatement,
-                                                      AssignmentStatement,
-                                                      IfStatement])
+                                             classes=[
+                                                 Num,
+                                                 Expression,
+                                                 LogicalTerm,
+                                                 LogicalFactor,
+                                                 BooleanEntity,
+                                                 ArithmeticExpression,
+                                                 Term,
+                                                 Factor, 
+                                                 ExponentiationBase,
+                                                 ExponentiationExponent,
+                                                 Statement, 
+                                                 PrintStatement,
+                                                 AssignmentStatement,
+                                                 IfStatement])
         self.pseudo_mm.register_obj_processors({
             'RootStatement': self.handle_root_statement,
         })
@@ -79,6 +91,10 @@ class PseudoToPy:
             node = self.create_term_node(value)
         elif isinstance(value, Factor):
             node = self.create_factor_node(value)
+        elif isinstance(value, ExponentiationBase):
+            node = self.create_exponentiation_base_node(value)
+        elif isinstance(value, ExponentiationExponent):
+            node = self.create_exponentiation_exponent_node(value)
         
         elif isinstance(value, Statement):
             node = self.statement_to_node(value)
@@ -164,10 +180,37 @@ class PseudoToPy:
         return node
 
     def create_factor_node(self, factor):
+        baseNode = self.to_node(factor.base)
+        # When no parenthesis, exponentiations are read from right to left
+        if len(factor.exponents) != 0 :
+            lastExponentIndex = len(factor.exponents) - 1
+            rightNode = self.to_node(factor.exponents[lastExponentIndex])
+            for i in range (lastExponentIndex -1, -1, -1 ):
+                rightNode = ast.BinOp(self.to_node(factor.exponents[i]), ast.Pow(), rightNode)
+            baseNode = ast.BinOp(baseNode, ast.Pow(), rightNode)
+        
         if (factor.sign in ['-', 'minus']):
-            return ast.UnaryOp(ast.USub(), self.to_node(factor.operand))
+            return ast.UnaryOp(ast.USub(), baseNode)
+        elif factor.sign in ['+', 'plus']:
+            return ast.UnaryOp(ast.UAdd(), baseNode)
+        elif (factor.sign == None):
+            return baseNode
+        else :
+            raise
+
+    def create_exponentiation_base_node(self, base):
+        return self.to_node(base.operand)
+    
+    def create_exponentiation_exponent_node(self, exponent):
+        node = self.to_node(exponent.operand)
+        if (exponent.sign in ['-', 'minus']):
+            return ast.UnaryOp(ast.USub(), node)
+        elif exponent.sign in ['+', 'plus']:
+            return ast.UnaryOp(ast.UAdd(), node)
+        elif (exponent.sign == None):
+            return node
         else:
-            return self.to_node(factor.operand)
+            raise
 
 
 pseudo_to_py = PseudoToPy()
