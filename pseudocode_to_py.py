@@ -18,10 +18,10 @@ class PseudoToPy:
                                                  BooleanEntity,
                                                  ArithmeticExpression,
                                                  Term,
-                                                 Factor, 
+                                                 Factor,
                                                  ExponentiationBase,
                                                  ExponentiationExponent,
-                                                 Statement, 
+                                                 Statement,
                                                  PrintStatement,
                                                  AssignmentStatement,
                                                  IfStatement])
@@ -47,7 +47,7 @@ class PseudoToPy:
             node = self.assignment_to_node(statement)
         elif type(statement) is IfStatement:
             node = self.if_to_node(statement)
-            
+
         else:
             raise
         return node
@@ -76,7 +76,7 @@ class PseudoToPy:
     def to_node(self, value):
         if isinstance(value, Num):
             node = ast.Num(n=value.n)
-        
+
         elif isinstance(value, Expression):
             node = self.create_expression_node(value)
         elif isinstance(value, LogicalTerm):
@@ -95,7 +95,7 @@ class PseudoToPy:
             node = self.create_exponentiation_base_node(value)
         elif isinstance(value, ExponentiationExponent):
             node = self.create_exponentiation_exponent_node(value)
-        
+
         elif isinstance(value, Statement):
             node = self.statement_to_node(value)
         elif hasattr(value, 'id'):
@@ -105,118 +105,117 @@ class PseudoToPy:
         return node
 
     def create_expression_node(self, expression):
-        if (len(expression.logicalTerms) == 1):
-            return self.to_node(expression.logicalTerms[0])
-        logicalTermsNodes = []
-        for t in expression.logicalTerms:
-            logicalTermsNodes.append(self.to_node(t))
-        return ast.BoolOp(ast.Or(), logicalTermsNodes)
+        if len(expression.logical_terms) == 1:
+            return self.to_node(expression.logical_terms[0])
+        logical_terms_nodes = []
+        for t in expression.logical_terms:
+            logical_terms_nodes.append(self.to_node(t))
+        return ast.BoolOp(ast.Or(), logical_terms_nodes)
 
-    def create_logical_term_node(self, logicalTerm):
-        if (len(logicalTerm.logicalFactors) == 1):
-            return self.to_node(logicalTerm.logicalFactors[0])
-        logicalFactorsNodes = []
-        for f in logicalTerm.logicalFactors:
-            logicalFactorsNodes.append(self.to_node(f))
-        return ast.BoolOp(ast.And(), logicalFactorsNodes)
+    def create_logical_term_node(self, logical_term):
+        if len(logical_term.logical_factors) == 1:
+            return self.to_node(logical_term.logical_factors[0])
+        logical_factors_nodes = []
+        for f in logical_term.logical_factors:
+            logical_factors_nodes.append(self.to_node(f))
+        return ast.BoolOp(ast.And(), logical_factors_nodes)
 
-    def create_logical_factor_node(self, logicalFactor):
-        if (logicalFactor.sign in ['!', 'not']):
-            return ast.UnaryOp(ast.Not(), self.to_node(logicalFactor.operand))
-        elif (logicalFactor.sign == None):
-            return self.to_node(logicalFactor.operand)
+    def create_logical_factor_node(self, logical_factor):
+        if logical_factor.sign in ['!', 'not']:
+            return ast.UnaryOp(ast.Not(), self.to_node(logical_factor.operand))
+        elif logical_factor.sign is None:
+            return self.to_node(logical_factor.operand)
         else:
             raise
 
-    def create_boolean_entity_node(self, booleanEntity):
-        pythonCmpOp = None;
-        leftNode = self.to_node(booleanEntity.left)
-        if (booleanEntity.operator == None):
-            return leftNode
-        elif (booleanEntity.operator in ['==', 'is equal to']):
-            pythonCmpOp = ast.Eq()
-        elif (booleanEntity.operator in ['!=', 'is not equal to', 'is different from']):
-            pythonCmpOp = ast.NotEq()
-        elif (booleanEntity.operator in ['>', 'is greater than']):
-            pythonCmpOp = ast.Gt();
-        elif (booleanEntity.operator in ['>=', 'is greater or equal to']):
-            pythonCmpOp = ast.GtE();
-        elif (booleanEntity.operator in ['<', 'is lower than']):
-            pythonCmpOp = ast.Lt();
-        elif (booleanEntity.operator in ['<=', 'is lower or equal to']):
-            pythonCmpOp = ast.LtE();
+    def create_boolean_entity_node(self, boolean_entity):
+        left_node = self.to_node(boolean_entity.left)
+        if boolean_entity.operator is None:
+            return left_node
+        elif boolean_entity.operator in ['==', 'is equal to']:
+            python_cmp_op = ast.Eq()
+        elif boolean_entity.operator in ['!=', 'is not equal to', 'is different from']:
+            python_cmp_op = ast.NotEq()
+        elif boolean_entity.operator in ['>', 'is greater than']:
+            python_cmp_op = ast.Gt();
+        elif boolean_entity.operator in ['>=', 'is greater or equal to']:
+            python_cmp_op = ast.GtE();
+        elif boolean_entity.operator in ['<', 'is lower than']:
+            python_cmp_op = ast.Lt();
+        elif boolean_entity.operator in ['<=', 'is lower or equal to']:
+            python_cmp_op = ast.LtE();
         else:
             raise
-        
-        rightNode = self.to_node(booleanEntity.right)
-        return ast.Compare(leftNode, (pythonCmpOp,), (rightNode,))
+
+        right_node = self.to_node(boolean_entity.right)
+        return ast.Compare(left_node, (python_cmp_op,), (right_node,))
 
     def create_arithmetic_expression_node(self, arith_expr):
-        lastTermIndex = len(arith_expr.terms)
+        last_term_index = len(arith_expr.terms)
         node = self.to_node(arith_expr.terms[0])
-        if lastTermIndex == 0:
+        if last_term_index == 0:
             return node
-        for i in range (1, lastTermIndex ):
-            if (arith_expr.operators[i-1] in ['+', 'plus']):
+        for i in range(1, last_term_index):
+            if arith_expr.operators[i - 1] in ['+', 'plus']:
                 node = ast.BinOp(node, ast.Add(), self.to_node(arith_expr.terms[i]))
-            elif (arith_expr.operators[i-1] in ['-', 'minus']):
+            elif arith_expr.operators[i - 1] in ['-', 'minus']:
                 node = ast.BinOp(node, ast.Sub(), self.to_node(arith_expr.terms[i]))
         return node
-    
+
     def create_term_node(self, term):
-        lastFactorIndex = len(term.factors)
+        last_factor_index = len(term.factors)
         node = self.to_node(term.factors[0])
-        if lastFactorIndex == 0:
+        if last_factor_index == 0:
             return node
-        for i in range (1, lastFactorIndex ):
-            if (term.operators[i-1] in ["*", "times"]):
+        for i in range(1, last_factor_index):
+            if term.operators[i - 1] in ["*", "times"]:
                 node = ast.BinOp(node, ast.Mult(), self.to_node(term.factors[i]))
-            elif (term.operators[i-1] in ["/", "divided by"]):
+            elif term.operators[i - 1] in ["/", "divided by"]:
                 node = ast.BinOp(node, ast.Div(), self.to_node(term.factors[i]))
-            elif (term.operators[i-1] in ["%", "modulo"]):
+            elif term.operators[i - 1] in ["%", "modulo"]:
                 node = ast.BinOp(node, ast.Mod(), self.to_node(term.factors[i]))
-            else :
+            else:
                 raise
         return node
 
     def create_factor_node(self, factor):
-        baseNode = self.to_node(factor.base)
+        base_node = self.to_node(factor.base)
         # When no parenthesis, exponentiations are read from right to left
-        if len(factor.exponents) != 0 :
-            lastExponentIndex = len(factor.exponents) - 1
-            rightNode = self.to_node(factor.exponents[lastExponentIndex])
-            for i in range (lastExponentIndex -1, -1, -1 ):
-                rightNode = ast.BinOp(self.to_node(factor.exponents[i]), ast.Pow(), rightNode)
-            baseNode = ast.BinOp(baseNode, ast.Pow(), rightNode)
-        
-        if (factor.sign in ['-', 'minus']):
-            return ast.UnaryOp(ast.USub(), baseNode)
+        if len(factor.exponents) != 0:
+            last_exponent_index = len(factor.exponents) - 1
+            right_node = self.to_node(factor.exponents[last_exponent_index])
+            for i in range(last_exponent_index - 1, -1, -1):
+                right_node = ast.BinOp(self.to_node(factor.exponents[i]), ast.Pow(), right_node)
+            base_node = ast.BinOp(base_node, ast.Pow(), right_node)
+
+        if factor.sign in ['-', 'minus']:
+            return ast.UnaryOp(ast.USub(), base_node)
         elif factor.sign in ['+', 'plus']:
-            return ast.UnaryOp(ast.UAdd(), baseNode)
-        elif (factor.sign == None):
-            return baseNode
-        else :
+            return ast.UnaryOp(ast.UAdd(), base_node)
+        elif factor.sign is None:
+            return base_node
+        else:
             raise
 
     def create_exponentiation_base_node(self, base):
         return self.to_node(base.operand)
-    
+
     def create_exponentiation_exponent_node(self, exponent):
         node = self.to_node(exponent.operand)
-        if (exponent.sign in ['-', 'minus']):
+        if exponent.sign in ['-', 'minus']:
             return ast.UnaryOp(ast.USub(), node)
         elif exponent.sign in ['+', 'plus']:
             return ast.UnaryOp(ast.UAdd(), node)
-        elif (exponent.sign == None):
+        elif exponent.sign is None:
             return node
         else:
             raise
 
 
 pseudo_to_py = PseudoToPy()
-newAst = pseudo_to_py.convert('test.pseudo')
-newCode = astor.to_source(newAst)
-print(ast.dump(newAst))
-print(newCode)
+new_ast = pseudo_to_py.convert('test.pseudo')
+new_code = astor.to_source(new_ast)
+print(ast.dump(new_ast))
+print(new_code)
 print("##########")
-exec(newCode)
+exec(new_code)

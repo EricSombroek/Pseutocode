@@ -5,10 +5,10 @@ PrintStatement: ('print' | 'display' | 'show') arg=Expression;
 AssignmentStatement: target=Name ('=' | 'equals') value=Expression;
 IfStatement: 'if' test=Expression ('then:' | 'then :' | 'then' | ':') body*=Statement 'endif';
 
-Expression: logicalTerms=LogicalTerm (operators=OrOperator logicalTerms=LogicalTerm)* ;
+Expression: logical_terms=LogicalTerm (operators=OrOperator logical_terms=LogicalTerm)* ;
 OrOperator: '||' | 'or' ;
 
-LogicalTerm: logicalFactors=LogicalFactor (operators=AndOperator logicalFactors=LogicalFactor)* ;
+LogicalTerm: logical_factors=LogicalFactor (operators=AndOperator logical_factors=LogicalFactor)* ;
 AndOperator: '&&' | 'and' ;
 
 LogicalFactor: (sign=BooleanUnaryOpeator)? (operand=BooleanEntity | '(' operand=Expression ')');

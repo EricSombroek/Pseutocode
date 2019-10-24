@@ -28,10 +28,10 @@ b = a power 2
 
 Like many things in our pseudocode, the basic arithmetic operators have aliases so they can be pronounced and remembered easily.
 
-| Sum  | Subtraction   | Multiplication   | Division   | Modulo   | Exponentiation   |
-| ---- | ------------- | ---------------- | ---------- | -------- | ---------------- |
-| +    | -             | *                | /          | %        | **               |
-| plus | minus         | times            | divided by | module   | power            |
+| Sum  | Subtraction   | Multiplication   | Division   | Modulo   | Exponentiation          |
+| ---- | ------------- | ---------------- | ---------- | -------- | ------------------------|
+| +    | -             | *                | /          | %        | **                      |
+| plus | minus         | times            | divided by | module   | power, to the power of  |
 
 As an example, these two instructions are equivalent:
 ```
