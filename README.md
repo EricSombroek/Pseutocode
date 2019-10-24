@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.com/PatWg/Pseutocode.svg?branch=master)](https://travis-ci.com/PatWg/Pseutocode)
+
+
 # General description
 
 This project defines a grammar for a programming language based on pseudocode.

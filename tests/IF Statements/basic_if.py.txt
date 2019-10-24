@@ -1,0 +1,10 @@
+if a:
+    print(a)
+if b:
+    print(b)
+if c:
+    print(c)
+if d:
+    print(d)
+
+    
