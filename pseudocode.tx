@@ -1,6 +1,7 @@
 Module: statements*=RootStatement;
 RootStatement: Statement;
-Statement: (IfStatement | PrintStatement | AssignmentStatement);
+Statement: (DeclarationStatement | IfStatement | PrintStatement | AssignmentStatement);
+DeclarationStatement: 'declare' name=Name;
 PrintStatement: ('print' | 'display' | 'show') arg=Expression;
 AssignmentStatement: target=Name ('=' | 'equals') value=Expression;
 IfStatement: 'if' test=Expression ('then:' | 'then :' | 'then' | ':') body*=Statement 'endif';

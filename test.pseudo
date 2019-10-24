@@ -1,8 +1,11 @@
+declare a
 a equals 3
+declare b
 b equals 2
 a equals b % 4 divided by (3 - 5) * 7
 a equals 2 + 3
 a equals 3 + (b + a) / 4
+declare c
 c equals 3 * (b - a)
 show a
 
@@ -17,6 +20,7 @@ if a is different from 4:
     c = 1 power 2 power 3
     c = (1 power 2) power 3
     c = 1 power (2 power 3)
+    declare e
     e = 1 power minus 2 power 3
     e = (1 power minus 2) power 3
     e = 1 power minus(2 power 3)

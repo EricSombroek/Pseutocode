@@ -74,6 +74,12 @@ class Statement(object):
         self.parent = parent
 
 
+class DeclarationStatement(Statement):
+    def __init__(self, parent, name):
+        super().__init__(parent)
+        self.name = name
+
+
 class PrintStatement(Statement):
     def __init__(self, arg, parent):
         super().__init__(parent)

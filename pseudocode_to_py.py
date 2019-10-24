@@ -22,6 +22,7 @@ class PseudoToPy:
                                                  ExponentiationBase,
                                                  ExponentiationExponent,
                                                  Statement,
+                                                 DeclarationStatement,
                                                  PrintStatement,
                                                  AssignmentStatement,
                                                  IfStatement])
@@ -43,6 +44,8 @@ class PseudoToPy:
     def statement_to_node(self, statement):
         if type(statement) is PrintStatement:
             node = self.print_to_node(statement)
+        elif type(statement) is DeclarationStatement:
+            node = self.declaration_to_node(statement)
         elif type(statement) is AssignmentStatement:
             node = self.assignment_to_node(statement)
         elif type(statement) is IfStatement:
@@ -52,9 +55,22 @@ class PseudoToPy:
             raise
         return node
 
+    def declaration_to_node(self, declaration_statement):
+        var_id = declaration_statement.name.id
+
+        if var_id not in self.variables:
+            self.variables.append(var_id)
+        else:
+            raise Exception('You cannot declare the same variable twice')
+
+        node = ast.Assign(
+            targets=[ast.Name(id=var_id, ctx='Store')], value=ast.Constant(None))
+        return node
+
     def print_to_node(self, print_statement):
         arg = print_statement.arg
-        node = ast.Expr(value=ast.Call(func=ast.Name(id='print', ctx='Load'), args=[self.to_node(arg)], keywords=[]))
+        node = ast.Expr(value=ast.Call(func=ast.Name(
+            id='print', ctx='Load'), args=[self.to_node(arg)], keywords=[]))
         return node
 
     def assignment_to_node(self, assignment):
@@ -62,14 +78,17 @@ class PseudoToPy:
         value = assignment.value
 
         if target_id not in self.variables:
-            self.variables.append(target_id)
+            # self.variables.append(target_id)
+            raise Exception ('You must declare variable ' + target_id + ' before assigning it a value')
 
-        node = ast.Assign(targets=[ast.Name(id=target_id, ctx='Store')], value=self.to_node(value))
+        node = ast.Assign(
+            targets=[ast.Name(id=target_id, ctx='Store')], value=self.to_node(value))
         return node
 
     def if_to_node(self, if_statement):
         test_node = self.to_node(if_statement.test)
-        body_node = list(map(lambda stmt: self.to_node(stmt), if_statement.body))
+        body_node = list(
+            map(lambda stmt: self.to_node(stmt), if_statement.body))
         node = ast.If(test=test_node, body=body_node, orelse=[])
         return node
 
@@ -137,13 +156,13 @@ class PseudoToPy:
         elif boolean_entity.operator in ['!=', 'is not equal to', 'is different from']:
             python_cmp_op = ast.NotEq()
         elif boolean_entity.operator in ['>', 'is greater than']:
-            python_cmp_op = ast.Gt();
+            python_cmp_op = ast.Gt()
         elif boolean_entity.operator in ['>=', 'is greater or equal to']:
-            python_cmp_op = ast.GtE();
+            python_cmp_op = ast.GtE()
         elif boolean_entity.operator in ['<', 'is lower than']:
-            python_cmp_op = ast.Lt();
+            python_cmp_op = ast.Lt()
         elif boolean_entity.operator in ['<=', 'is lower or equal to']:
-            python_cmp_op = ast.LtE();
+            python_cmp_op = ast.LtE()
         else:
             raise
 
@@ -157,9 +176,11 @@ class PseudoToPy:
             return node
         for i in range(1, last_term_index):
             if arith_expr.operators[i - 1] in ['+', 'plus']:
-                node = ast.BinOp(node, ast.Add(), self.to_node(arith_expr.terms[i]))
+                node = ast.BinOp(
+                    node, ast.Add(), self.to_node(arith_expr.terms[i]))
             elif arith_expr.operators[i - 1] in ['-', 'minus']:
-                node = ast.BinOp(node, ast.Sub(), self.to_node(arith_expr.terms[i]))
+                node = ast.BinOp(
+                    node, ast.Sub(), self.to_node(arith_expr.terms[i]))
         return node
 
     def create_term_node(self, term):
@@ -169,11 +190,14 @@ class PseudoToPy:
             return node
         for i in range(1, last_factor_index):
             if term.operators[i - 1] in ["*", "times"]:
-                node = ast.BinOp(node, ast.Mult(), self.to_node(term.factors[i]))
+                node = ast.BinOp(node, ast.Mult(),
+                                 self.to_node(term.factors[i]))
             elif term.operators[i - 1] in ["/", "divided by"]:
-                node = ast.BinOp(node, ast.Div(), self.to_node(term.factors[i]))
+                node = ast.BinOp(
+                    node, ast.Div(), self.to_node(term.factors[i]))
             elif term.operators[i - 1] in ["%", "modulo"]:
-                node = ast.BinOp(node, ast.Mod(), self.to_node(term.factors[i]))
+                node = ast.BinOp(
+                    node, ast.Mod(), self.to_node(term.factors[i]))
             else:
                 raise
         return node
@@ -185,7 +209,8 @@ class PseudoToPy:
             last_exponent_index = len(factor.exponents) - 1
             right_node = self.to_node(factor.exponents[last_exponent_index])
             for i in range(last_exponent_index - 1, -1, -1):
-                right_node = ast.BinOp(self.to_node(factor.exponents[i]), ast.Pow(), right_node)
+                right_node = ast.BinOp(self.to_node(
+                    factor.exponents[i]), ast.Pow(), right_node)
             base_node = ast.BinOp(base_node, ast.Pow(), right_node)
 
         if factor.sign in ['-', 'minus']:
