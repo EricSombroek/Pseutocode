@@ -1,0 +1,15 @@
+if a then
+    show a
+else
+    show "Not a"
+end
+
+if b then
+    show b
+else
+    if c then
+        show c
+    else
+        show d
+    end
+end

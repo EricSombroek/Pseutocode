@@ -4,30 +4,27 @@ from pseudocode_to_py import PseudoToPy
 
 
 def test_run_all():
-
     for pseudoFileName in glob.iglob('tests/' + '**/*.pseudo', recursive=True):
 
-        astBuilder = PseudoToPy()
+        ast_builder = PseudoToPy()
 
-        pyFileName = pseudoFileName.replace('pseudo', 'py.txt')
+        py_file_name = pseudoFileName.replace('pseudo', 'py.txt')
 
-        pythonFile = open(pyFileName)
-        expectedPyCode = ""
-        expectedPyCode = pythonFile.read().rstrip()
-        pythonFile.close()
+        python_file = open(py_file_name)
+        expected_py_code = python_file.read().rstrip()
+        python_file.close()
 
-        ast = astBuilder.convert(pseudoFileName)
-        actualPyCode = ""
-        actualPyCode = astor.to_source(ast).rstrip()
+        ast = ast_builder.convert(pseudoFileName)
+        actual_py_code = astor.to_source(ast).rstrip()
 
         try:
-            assert expectedPyCode == actualPyCode
+            assert expected_py_code == actual_py_code
         except AssertionError as e:
             e.args = (
                 'For file :' + pseudoFileName,
-                'Expected :' + expectedPyCode,
-                'Actual :' + actualPyCode
+                'Expected :' + expected_py_code,
+                'Actual :' + actual_py_code
             )
-            print('Expected:\n' + expectedPyCode)
-            print('Actual:\n' + actualPyCode)
+            print('Expected:\n' + expected_py_code)
+            print('Actual:\n' + actual_py_code)
             raise

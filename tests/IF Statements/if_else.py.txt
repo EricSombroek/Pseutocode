@@ -1,0 +1,10 @@
+if a:
+    print(a)
+else:
+    print('Not a')
+if b:
+    print(b)
+elif c:
+    print(c)
+else:
+    print(d)

@@ -1,6 +1,6 @@
 if a :
     if b :
         if c :
-        endif
-    endif
-endif
+        end
+    end
+end

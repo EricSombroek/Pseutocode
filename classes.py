@@ -88,6 +88,20 @@ class AssignmentStatement(Statement):
 
 
 class IfStatement(Statement):
+    def __init__(self, parent, test, body, orelse):
+        super().__init__(parent)
+        self.test = test
+        self.body = body
+        self.orelse = orelse
+
+
+class ElseStatement(Statement):
+    def __init__(self, parent, body):
+        super().__init__(parent)
+        self.body = body
+
+
+class ElseIfStatement(Statement):
     def __init__(self, parent, test, body):
         super().__init__(parent)
         self.test = test

@@ -24,7 +24,9 @@ class PseudoToPy:
                                                  Statement,
                                                  PrintStatement,
                                                  AssignmentStatement,
-                                                 IfStatement])
+                                                 IfStatement,
+                                                 ElseStatement,
+                                                 ElseIfStatement])
         self.pseudo_mm.register_obj_processors({
             'RootStatement': self.handle_root_statement,
         })
@@ -70,7 +72,21 @@ class PseudoToPy:
     def if_to_node(self, if_statement):
         test_node = self.to_node(if_statement.test)
         body_node = list(map(lambda stmt: self.to_node(stmt), if_statement.body))
-        node = ast.If(test=test_node, body=body_node, orelse=[])
+        orelse_node = self.orelse_to_node(if_statement.orelse)
+        node = ast.If(test=test_node, body=body_node, orelse=orelse_node)
+        return node
+
+    def orelse_to_node(self, orelse_list):
+        if len(orelse_list) == 0:
+            return orelse_list
+        current_orelse = orelse_list.pop(0)
+        if isinstance(current_orelse, ElseIfStatement):
+            new_if = IfStatement(current_orelse.parent, current_orelse.test, current_orelse.body, orelse_list)
+            node = [self.if_to_node(new_if)]
+        elif isinstance(current_orelse, ElseStatement):
+            node = list(map(lambda stmt: self.to_node(stmt), current_orelse.body))
+        else:
+            raise
         return node
 
     def to_node(self, value):

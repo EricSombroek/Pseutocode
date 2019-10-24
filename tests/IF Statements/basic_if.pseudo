@@ -1,15 +1,15 @@
 if a then
     show a
-endif
+end
 
 if b then :
     show b
-endif
+end
 
 if c then:
     show c
-endif
+end
 
 if d :
     show d
-endif
+end
