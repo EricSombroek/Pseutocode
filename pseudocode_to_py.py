@@ -1,7 +1,5 @@
 from textx.metamodel import metamodel_from_file
 import ast
-import astor
-
 from classes import *
 
 
@@ -226,12 +224,3 @@ class PseudoToPy:
             return node
         else:
             raise
-
-
-pseudo_to_py = PseudoToPy()
-new_ast = pseudo_to_py.convert('test.pseudo')
-new_code = astor.to_source(new_ast)
-print(ast.dump(new_ast))
-print(new_code)
-print("##########")
-exec(new_code)
