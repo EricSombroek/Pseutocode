@@ -1,6 +1,0 @@
-if a:
-    print(a)
-elif b:
-    print(b)
-else:
-    print(c)

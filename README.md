@@ -17,7 +17,7 @@ valid Python instructions.
 - textX
 - pytest (for unit tests)
 
-`pip install astor textX pytest`
+`pip install astor textX pytest` or `pip install -r requirements.txt`
 
 # Usage
 
@@ -29,6 +29,10 @@ The available flags are :
  - `-e` `--exec` : Executes the generated Python code
  - `-q` `--quiet` : Don't print the generated Python code
  - `-h` `--help` : Shows a help message
+ 
+ # Testing
+ 
+ To run unit tests, run `pytest` at the root of the project.
 
 # Syntax
 

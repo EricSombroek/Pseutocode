@@ -29,8 +29,18 @@ class PseudoToPy:
             'RootStatement': self.handle_root_statement,
         })
 
+    def reset_ast(self):
+        self.py_ast = ast.Module(body=[])
+        self.variables = []
+
     def convert(self, filename):
+        self.reset_ast()
         self.pseudo_mm.model_from_file(filename)
+        return self.py_ast
+
+    def str_convert(self, pseudo_str):
+        self.reset_ast()
+        self.pseudo_mm.model_from_str(pseudo_str)
         return self.py_ast
 
     def add_to_ast(self, node):
