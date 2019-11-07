@@ -10,6 +10,8 @@ class PseudoToPy:
         self.pseudo_mm = metamodel_from_file('pseudocode.tx',
                                              classes=[
                                                  Num,
+                                                 Name,
+                                                 BooleanConstant,
                                                  Expression,
                                                  LogicalTerm,
                                                  LogicalFactor,
@@ -119,11 +121,12 @@ class PseudoToPy:
             node = self.create_exponentiation_base_node(value)
         elif isinstance(value, ExponentiationExponent):
             node = self.create_exponentiation_exponent_node(value)
-
         elif isinstance(value, Statement):
             node = self.statement_to_node(value)
-        elif hasattr(value, 'id'):
+        elif isinstance(value, Name):
             node = ast.Name(id=value.id, ctx='Load')
+        elif isinstance(value, BooleanConstant):
+            node = ast.NameConstant(value=value.boolean_value == 'true')
         else:
             node = ast.Str(s=value.s)
         return node
@@ -161,13 +164,13 @@ class PseudoToPy:
         elif boolean_entity.operator in ['!=', 'is not equal to', 'is different from']:
             python_cmp_op = ast.NotEq()
         elif boolean_entity.operator in ['>', 'is greater than']:
-            python_cmp_op = ast.Gt();
+            python_cmp_op = ast.Gt()
         elif boolean_entity.operator in ['>=', 'is greater or equal to']:
-            python_cmp_op = ast.GtE();
+            python_cmp_op = ast.GtE()
         elif boolean_entity.operator in ['<', 'is lower than']:
-            python_cmp_op = ast.Lt();
+            python_cmp_op = ast.Lt()
         elif boolean_entity.operator in ['<=', 'is lower or equal to']:
-            python_cmp_op = ast.LtE();
+            python_cmp_op = ast.LtE()
         else:
             raise
 

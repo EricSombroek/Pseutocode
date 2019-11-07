@@ -40,8 +40,10 @@ ExponentiationExponent: (sign=UnaryOperator)? (operand=Factor | '(' operand=Expr
 
 UnaryOperator:  '+' | 'plus' | '-' | 'minus';
 
-Value: (Num | Name | Str);
+Value: (Num | BooleanConstant | Name | Str);
 Num: n=NUMBER;
 Name: id=ID;
 Str: s=STRING;
+BooleanConstant: boolean_value=BooleanConstantValue;
+BooleanConstantValue: "true" | "false";
 

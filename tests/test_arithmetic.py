@@ -12,6 +12,17 @@ myBool equals a plus 2 minus 3 is equal to b and d power 5 modulo 7 is equal to 
 
         assert ast_check(ptp, py_str, pseudo_str)
 
+    def test_boolean_constant(self, ptp):
+        pseudo_str = """
+truthy equals true
+falsy equals false
+"""
+        py_str = """
+truthy = True
+falsy = False
+"""
+        assert ast_check(ptp, py_str, pseudo_str)
+
     def test_multi_div_mod(self, ptp):
         pseudo_str = """
 myvar equals a times 2 modulo 3 divided by 90 plus a minus 3 * 2 / someVar % 7
