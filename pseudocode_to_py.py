@@ -27,7 +27,9 @@ class PseudoToPy:
                                                  IfStatement,
                                                  ElseStatement,
                                                  ElseIfStatement,
-                                                 WhileStatement])
+                                                 WhileStatement,
+                                                 BreakStatement,
+                                                 ContinueStatement])
         self.pseudo_mm.register_obj_processors({
             'RootStatement': self.handle_root_statement,
         })
@@ -62,6 +64,10 @@ class PseudoToPy:
             node = self.if_to_node(statement)
         elif type(statement) is WhileStatement:
             node = self.while_to_node(statement)
+        elif type(statement) is BreakStatement:
+            node = ast.Break()
+        elif type(statement) is ContinueStatement:
+            node = ast.Continue()
 
         else:
             raise

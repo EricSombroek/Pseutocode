@@ -126,3 +126,15 @@ class WhileStatement(Statement):
         self.test = test
         self.body = body
         self.orelse = orelse
+
+
+class BreakStatement(Statement):
+    def __init__(self, parent, _):
+        super().__init__(parent)
+        self._ = _
+
+
+class ContinueStatement(Statement):
+    def __init__(self, parent, _):
+        super().__init__(parent)
+        self._ = _

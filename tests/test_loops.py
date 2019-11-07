@@ -56,3 +56,25 @@ while a > b:
         """
 
         assert ast_check(ptp, py_str, pseudo_str)
+
+    def test_break_continue(self, ptp):
+        pseudo_str = """
+while a is greater than b do
+    if a is equal to 2 then
+        break
+    end
+    if a is equal to 3 then
+        continue
+    end
+end
+        """
+
+        py_str = """
+while a > b:
+    if a == 2:
+        break
+    if a == 3:
+        continue
+        """
+
+        assert ast_check(ptp, py_str, pseudo_str)
