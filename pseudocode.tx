@@ -4,7 +4,10 @@ Statement: (DeclarationStatement | IfStatement | PrintStatement | AssignmentStat
 DeclarationStatement: 'declare' name=Name;
 PrintStatement: ('print' | 'display' | 'show') arg=Expression;
 AssignmentStatement: target=Name ('=' | 'equals') value=Expression;
-IfStatement: 'if' test=Expression ('then:' | 'then :' | 'then' | ':') body*=Statement 'endif';
+IfStatement: 'if' test=Expression ('then:' | 'then :' | 'then' | ':') body*=Statement orelse*=OrElse 'end';
+OrElse: (ElseIfStatement | ElseStatement);
+ElseStatement: 'else' body*=Statement &'end';
+ElseIfStatement: 'else if' test=Expression ('then:' | 'then :' | 'then' | ':') body*=Statement &('end' | 'else');
 
 Expression: logical_terms=LogicalTerm (operators=OrOperator logical_terms=LogicalTerm)* ;
 OrOperator: '||' | 'or' ;
@@ -38,8 +41,10 @@ ExponentiationExponent: (sign=UnaryOperator)? (operand=Factor | '(' operand=Expr
 
 UnaryOperator:  '+' | 'plus' | '-' | 'minus';
 
-Value: (Num | Name | Str);
+Value: (Num | BooleanConstant | Name | Str);
 Num: n=NUMBER;
 Name: id=ID;
 Str: s=STRING;
+BooleanConstant: boolean_value=BooleanConstantValue;
+BooleanConstantValue: "true" | "false";
 

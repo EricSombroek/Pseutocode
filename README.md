@@ -10,6 +10,29 @@ _spoken_ and intelligible for someone without any programming background.
 After having defined this pseudocode, we are also capable of translating it into
 valid Python instructions.
 
+# Prerequisites
+
+- astor
+- textX
+- pytest (for unit tests)
+
+`pip install astor textX pytest` or `pip install -r requirements.txt`
+
+# Usage
+
+Python code can be generated through the command line this way : `python pseudotopy_cl.py INPUT_FILE`.
+This will print out the generated code based on the pseudocode of the input file.
+
+The available flags are :
+ - `-a` `--ast` : Prints the generated Python AST
+ - `-e` `--exec` : Executes the generated Python code
+ - `-q` `--quiet` : Don't print the generated Python code
+ - `-h` `--help` : Shows a help message
+ 
+ # Testing
+ 
+ To run unit tests, run `pytest` at the root of the project.
+
 # Syntax
 
 ## Variable declaration

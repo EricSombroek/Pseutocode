@@ -1,7 +1,5 @@
 from textx.metamodel import metamodel_from_file
 import ast
-import astor
-
 from classes import *
 
 
@@ -12,6 +10,8 @@ class PseudoToPy:
         self.pseudo_mm = metamodel_from_file('pseudocode.tx',
                                              classes=[
                                                  Num,
+                                                 Name,
+                                                 BooleanConstant,
                                                  Expression,
                                                  LogicalTerm,
                                                  LogicalFactor,
@@ -25,13 +25,25 @@ class PseudoToPy:
                                                  DeclarationStatement,
                                                  PrintStatement,
                                                  AssignmentStatement,
-                                                 IfStatement])
+                                                 IfStatement,
+                                                 ElseStatement,
+                                                 ElseIfStatement])
         self.pseudo_mm.register_obj_processors({
             'RootStatement': self.handle_root_statement,
         })
 
+    def reset_ast(self):
+        self.py_ast = ast.Module(body=[])
+        self.variables = []
+
     def convert(self, filename):
+        self.reset_ast()
         self.pseudo_mm.model_from_file(filename)
+        return self.py_ast
+
+    def str_convert(self, pseudo_str):
+        self.reset_ast()
+        self.pseudo_mm.model_from_str(pseudo_str)
         return self.py_ast
 
     def add_to_ast(self, node):
@@ -77,9 +89,9 @@ class PseudoToPy:
         target_id = assignment.target.id
         value = assignment.value
 
-        if target_id not in self.variables:
-            # self.variables.append(target_id)
-            raise Exception ('You must declare variable ' + target_id + ' before assigning it a value')
+        # UNCOMMENT TO FORCE DECLARATION OF VARIABLES
+        # if target_id not in self.variables:
+        #   raise Exception ('You must declare variable ' + target_id + ' before assigning it a value')
 
         node = ast.Assign(
             targets=[ast.Name(id=target_id, ctx='Store')], value=self.to_node(value))
@@ -89,7 +101,23 @@ class PseudoToPy:
         test_node = self.to_node(if_statement.test)
         body_node = list(
             map(lambda stmt: self.to_node(stmt), if_statement.body))
-        node = ast.If(test=test_node, body=body_node, orelse=[])
+        orelse_node = self.orelse_to_node(if_statement.orelse)
+        node = ast.If(test=test_node, body=body_node, orelse=orelse_node)
+        return node
+
+    def orelse_to_node(self, orelse_list):
+        if len(orelse_list) == 0:
+            return orelse_list
+        current_orelse = orelse_list.pop(0)
+        if isinstance(current_orelse, ElseIfStatement):
+            new_if = IfStatement(
+                current_orelse.parent, current_orelse.test, current_orelse.body, orelse_list)
+            node = [self.if_to_node(new_if)]
+        elif isinstance(current_orelse, ElseStatement):
+            node = list(
+                map(lambda stmt: self.to_node(stmt), current_orelse.body))
+        else:
+            raise
         return node
 
     def to_node(self, value):
@@ -114,11 +142,12 @@ class PseudoToPy:
             node = self.create_exponentiation_base_node(value)
         elif isinstance(value, ExponentiationExponent):
             node = self.create_exponentiation_exponent_node(value)
-
         elif isinstance(value, Statement):
             node = self.statement_to_node(value)
-        elif hasattr(value, 'id'):
+        elif isinstance(value, Name):
             node = ast.Name(id=value.id, ctx='Load')
+        elif isinstance(value, BooleanConstant):
+            node = ast.NameConstant(value=value.boolean_value == 'true')
         else:
             node = ast.Str(s=value.s)
         return node
@@ -235,12 +264,3 @@ class PseudoToPy:
             return node
         else:
             raise
-
-
-pseudo_to_py = PseudoToPy()
-new_ast = pseudo_to_py.convert('test.pseudo')
-new_code = astor.to_source(new_ast)
-print(ast.dump(new_ast))
-print(new_code)
-print("##########")
-exec(new_code)

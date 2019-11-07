@@ -13,10 +13,14 @@ if a is different from 4:
     show "High"
     if a is greater than 5 or a is equal to 3 modulo 6 and 2 is greater or equal to (c minus (4 times 2)) then
         show "Very high"
-    endif
+    else if a is greater than 4 then
+        show "Just high"
+    else
+        show "Not that high"
+    end
     if a + 3 to the power of minus 1 power 2 power - (2 times 2 + 4) is greater than b:
         show "nope"
-    endif
+    end
     c = 1 power 2 power 3
     c = (1 power 2) power 3
     c = 1 power (2 power 3)
@@ -25,5 +29,4 @@ if a is different from 4:
     e = (1 power minus 2) power 3
     e = 1 power minus(2 power 3)
     e = 1 power (minus 2 power 3)
-endif
-
+end

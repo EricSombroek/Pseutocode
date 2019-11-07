@@ -4,6 +4,18 @@ class Num(object):
         self.n = n
 
 
+class Name(object):
+    def __init__(self, parent, id):
+        self.parent = parent
+        self.id = id
+
+
+class BooleanConstant(object):
+    def __init__(self, parent, boolean_value):
+        self.parent = parent
+        self.boolean_value = boolean_value
+
+
 class Expression(object):
     def __init__(self, parent, logical_terms, operators):
         self.parent = parent
@@ -94,6 +106,20 @@ class AssignmentStatement(Statement):
 
 
 class IfStatement(Statement):
+    def __init__(self, parent, test, body, orelse):
+        super().__init__(parent)
+        self.test = test
+        self.body = body
+        self.orelse = orelse
+
+
+class ElseStatement(Statement):
+    def __init__(self, parent, body):
+        super().__init__(parent)
+        self.body = body
+
+
+class ElseIfStatement(Statement):
     def __init__(self, parent, test, body):
         super().__init__(parent)
         self.test = test
