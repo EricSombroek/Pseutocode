@@ -55,3 +55,14 @@ myvar = a ** 3 ** 5
         """
 
         assert ast_check(ptp, py_str, pseudo_str)
+
+    def test_float(self, ptp):
+        pseudo_str = """
+myvar equals 2.25 plus 3.56
+        """
+
+        py_str = """
+myvar = 2.25 + 3.56
+        """
+
+        assert ast_check(ptp, py_str, pseudo_str)
