@@ -1,12 +1,13 @@
 Module: statements*=RootStatement;
 RootStatement: Statement;
-Statement: (IfStatement | PrintStatement | AssignmentStatement);
+Statement: (IfStatement | WhileStatement | PrintStatement | AssignmentStatement);
 PrintStatement: ('print' | 'display' | 'show') arg=Expression;
 AssignmentStatement: target=Name ('=' | 'equals') value=Expression;
 IfStatement: 'if' test=Expression ('then:' | 'then :' | 'then' | ':') body*=Statement orelse*=OrElse 'end';
 OrElse: (ElseIfStatement | ElseStatement);
 ElseStatement: 'else' body*=Statement &'end';
 ElseIfStatement: 'else if' test=Expression ('then:' | 'then :' | 'then' | ':') body*=Statement &('end' | 'else');
+WhileStatement: 'while' test=Expression ('do' | 'do :' | ':') body*=Statement orelse*=OrElse 'end';
 
 Expression: logical_terms=LogicalTerm (operators=OrOperator logical_terms=LogicalTerm)* ;
 OrOperator: '||' | 'or' ;

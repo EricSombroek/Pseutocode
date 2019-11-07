@@ -26,7 +26,8 @@ class PseudoToPy:
                                                  AssignmentStatement,
                                                  IfStatement,
                                                  ElseStatement,
-                                                 ElseIfStatement])
+                                                 ElseIfStatement,
+                                                 WhileStatement])
         self.pseudo_mm.register_obj_processors({
             'RootStatement': self.handle_root_statement,
         })
@@ -59,6 +60,8 @@ class PseudoToPy:
             node = self.assignment_to_node(statement)
         elif type(statement) is IfStatement:
             node = self.if_to_node(statement)
+        elif type(statement) is WhileStatement:
+            node = self.while_to_node(statement)
 
         else:
             raise
@@ -97,6 +100,13 @@ class PseudoToPy:
             node = list(map(lambda stmt: self.to_node(stmt), current_orelse.body))
         else:
             raise
+        return node
+
+    def while_to_node(self, while_statement):
+        test_node = self.to_node(while_statement.test)
+        body_node = list(map(lambda stmt: self.to_node(stmt), while_statement.body))
+        orelse_node = self.orelse_to_node(while_statement.orelse)
+        node = ast.While(test=test_node, body=body_node, orelse=orelse_node)
         return node
 
     def to_node(self, value):

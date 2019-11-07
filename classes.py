@@ -118,3 +118,11 @@ class ElseIfStatement(Statement):
         super().__init__(parent)
         self.test = test
         self.body = body
+
+
+class WhileStatement(Statement):
+    def __init__(self, parent, test, body, orelse):
+        super().__init__(parent)
+        self.test = test
+        self.body = body
+        self.orelse = orelse
