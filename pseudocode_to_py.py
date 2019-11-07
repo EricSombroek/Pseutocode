@@ -131,7 +131,8 @@ class PseudoToPy:
 
     def while_to_node(self, while_statement):
         test_node = self.to_node(while_statement.test)
-        body_node = list(map(lambda stmt: self.to_node(stmt), while_statement.body))
+        body_node = list(
+            map(lambda stmt: self.to_node(stmt), while_statement.body))
         orelse_node = self.orelse_to_node(while_statement.orelse)
         node = ast.While(test=test_node, body=body_node, orelse=orelse_node)
         return node
